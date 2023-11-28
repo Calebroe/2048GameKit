@@ -11,7 +11,7 @@ import SwiftUI
 struct IOS2048gameApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainScreen()
         }
     }
 }
