@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C3342532B16E829000714D3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3342522B16E829000714D3 /* SettingsView.swift */; };
 		3C7C76C82B02C5090063C5EF /* IOS2048gameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C76C72B02C5090063C5EF /* IOS2048gameApp.swift */; };
 		3C7C76CA2B02C5090063C5EF /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C76C92B02C5090063C5EF /* GameView.swift */; };
 		3C7C76CC2B02C50B0063C5EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3C7C76CB2B02C50B0063C5EF /* Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3C3342522B16E829000714D3 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3C7C76C42B02C5090063C5EF /* IOS2048game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IOS2048game.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C7C76C72B02C5090063C5EF /* IOS2048gameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOS2048gameApp.swift; sourceTree = "<group>"; };
 		3C7C76C92B02C5090063C5EF /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 				3C7C76C72B02C5090063C5EF /* IOS2048gameApp.swift */,
 				3C7C76C92B02C5090063C5EF /* GameView.swift */,
 				3C7C76D52B02CAA10063C5EF /* MainScreen.swift */,
+				3C3342522B16E829000714D3 /* SettingsView.swift */,
 				3C7C76CB2B02C50B0063C5EF /* Assets.xcassets */,
 				3C7C76CD2B02C50B0063C5EF /* Preview Content */,
 			);
@@ -141,6 +144,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C7C76D62B02CAA10063C5EF /* MainScreen.swift in Sources */,
+				3C3342532B16E829000714D3 /* SettingsView.swift in Sources */,
 				3C7C76CA2B02C5090063C5EF /* GameView.swift in Sources */,
 				3C7C76C82B02C5090063C5EF /* IOS2048gameApp.swift in Sources */,
 			);

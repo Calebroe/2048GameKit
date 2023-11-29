@@ -12,8 +12,14 @@ struct GameView: View {
     @State private var grid: [[Int]]
     @State private var score: Int = 0
     @State private var highScore: Int = 0 // Initialized later
+    @State private var moveCount: Int = 0
     @State private var isGameOver = false
 
+    @Environment(\.presentationMode) var presentationMode
+    
+    @State private var gameTime = 0
+        let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
     init(gridSize: GridSize) {
         self.gridSize = gridSize
         let size = gridSize.rawValue
@@ -22,10 +28,24 @@ struct GameView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("SCORE: \(score)")
+            // Big 2048 title with each letter in different color
+            HStack(spacing: 0) {
+                Text("2").font(.largeTitle).fontWeight(.heavy).foregroundColor(.red)
+                Text("0").font(.largeTitle).fontWeight(.heavy).foregroundColor(.green)
+                Text("4").font(.largeTitle).fontWeight(.heavy).foregroundColor(.blue)
+                Text("8").font(.largeTitle).fontWeight(.heavy).foregroundColor(.orange)
+            }
+
+            // Subtitle text
+            Text("Merge tiles to get the 2048 tile!")
                 .font(.headline)
-            Text("HIGH SCORE: \(highScore)")
-                .font(.headline)
+                .foregroundColor(.gray)
+
+            // Score and High Score display
+            HStack {
+                scoreView(title: "SCORE", score: score)
+                scoreView(title: "HIGH SCORE", score: highScore)
+            }
 
             VStack(spacing: 5) {
                 ForEach(0..<grid.count, id: \.self) { i in
@@ -43,7 +63,18 @@ struct GameView: View {
             }
             .background(Color.black.opacity(0.5))
             .cornerRadius(10)
+            // Time and Move Count in HStack
+            HStack {
+                Text("Time: \(formatTime(gameTime))")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading) // Aligns to left
 
+                Text("Moves: \(moveCount)")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to right
+            }
+
+            
             Button("New Game") {
                 startNewGame()
             }
@@ -53,6 +84,17 @@ struct GameView: View {
             .cornerRadius(10)
         }
         .padding()
+        .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    backButton
+                }
+            }
+        .onReceive(timer) { _ in
+            if !isGameOver {
+                gameTime += 1
+            }
+        }
         .onAppear {
             highScore = UserDefaults.standard.integer(forKey: highScoreKey)
             startNewGame()
@@ -60,10 +102,26 @@ struct GameView: View {
         .gesture(DragGesture(minimumDistance: 20).onEnded(handleSwipe))
         .overlay(gameOverOverlay)
     }
+    
+    var backButton: some View {
+       Button(action: {
+           presentationMode.wrappedValue.dismiss()
+       }) {
+           HStack {
+               Text("Main Menu")
+           }
+           .foregroundColor(.white)
+           .padding(5)
+           .background(Color.gray)
+           .cornerRadius(8)
+       }
+   }
 
     // Game Logic
     private func startNewGame() {
         score = 0
+        gameTime = 0
+        moveCount = 0
         let size = gridSize.rawValue
         grid = Array(repeating: Array(repeating: 0, count: size), count: size)
         addNumber()
@@ -111,6 +169,7 @@ struct GameView: View {
             }
         }
         if moved {
+            moveCount += 1 // Increment move count
             addNumber()
         }
         updateHighScore()
@@ -139,6 +198,7 @@ struct GameView: View {
             }
         }
         if moved {
+            moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
             checkForGameOver()
@@ -175,6 +235,7 @@ struct GameView: View {
             }
         }
         if moved {
+            moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
             checkForGameOver()
@@ -211,6 +272,7 @@ struct GameView: View {
             }
         }
         if moved {
+            moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
             checkForGameOver()
@@ -224,6 +286,13 @@ struct GameView: View {
             isGameOver = true
             updateHighScore() // Ensure the high score is updated when the game is over
         }
+    }
+    
+    private func formatTime(_ totalSeconds: Int) -> String {
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 
     private func isMovePossible() -> Bool {
@@ -264,9 +333,10 @@ struct GameView: View {
         case 4: return Color(red: 0.92, green: 0.85, blue: 0.72)
         case 8: return Color.orange
         case 16: return Color.red
-        case 32: return Color.pink
+        case 32: return Color.cyan
         case 64: return Color.purple
         case 128, 256, 512, 1024, 2048: return Color.yellow
+        case 4096: return Color.cyan
         default: return Color.gray
         }
     }
@@ -320,6 +390,33 @@ struct GameView: View {
     }
 
     // Rest of the GameView code...
+    
+    // Score view method
+    private func scoreView(title: String, score: Int) -> some View {
+        VStack {
+            Text(title)
+                .font(.headline)
+            Text(formatScore(score))
+                .font(.title2)
+        }
+        .padding()
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.gray, lineWidth: 2)
+        )
+    }
+
+    // Utility function to format score
+    private func formatScore(_ score: Int) -> String {
+        if score > 999 {
+            let formattedScore = Double(score) / 1000.0
+            return String(format: "%.1fK", formattedScore)
+        } else {
+            return "\(score)"
+        }
+    }
 }
 
 struct GameView_Previews: PreviewProvider {

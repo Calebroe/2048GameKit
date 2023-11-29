@@ -12,6 +12,9 @@ enum GridSize: Int, Hashable {
 }
 
 struct MainScreen: View {
+    
+    @State private var showingSettings = false
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -39,30 +42,49 @@ struct MainScreen: View {
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
+                    .padding(.bottom)
 
                 // Continue Game and Settings buttons...
+                // Settings button with drop-down menu
+                Button("Settings") {
+                    showingSettings = true
+                }
+                .padding()
+                .background(Color.gray)
+                .foregroundColor(.white)
+                .cornerRadius(8)
 
                 Spacer()
 
-                HStack {
-                    Button("LeaderBoard") {
-                        // Action to show leaderboard
-                    }
-                    .padding()
+                // Lower Leaderboard and Achievements buttons
+                VStack {
+                    HStack {
+                        Button("LeaderBoard") {
+                            // Action to show leaderboard
+                        }
+                        .padding()
 
-                    Button("Achievements") {
-                        // Action to show achievements
+                        Button("Achievements") {
+                            // Action to show achievements
+                        }
+                        .padding()
                     }
-                    .padding()
+                    .padding(.bottom, 0) // Moves the HStack lower down on the screen
                 }
 
                 Spacer()
             }
             .navigationTitle("Main Menu")
             .navigationBarHidden(true)
+            .sheet(isPresented: $showingSettings) {
+                // This is the settings view that will be presented as a sheet.
+                SettingsView(showingSettings: $showingSettings)
+            }
         }
     }
 }
+
+
 
 struct MainScreen_Previews: PreviewProvider {
     static var previews: some View {
