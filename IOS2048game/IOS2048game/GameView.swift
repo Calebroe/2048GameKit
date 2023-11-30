@@ -14,6 +14,8 @@ struct GameView: View {
     @State private var highScore: Int = 0 // Initialized later
     @State private var moveCount: Int = 0
     @State private var isGameOver = false
+    @State private var isGameWon = false
+    @State private var endlessMode = false
 
     @Environment(\.presentationMode) var presentationMode
     
@@ -36,6 +38,13 @@ struct GameView: View {
                 Text("8").font(.largeTitle).fontWeight(.heavy).foregroundColor(.orange)
             }
 
+            if endlessMode {
+                // Subtitle text
+                Text("Endless Mode!!")
+                    .font(.headline)
+                    .foregroundColor(.red)
+
+            }
             // Subtitle text
             Text("Merge tiles to get the 2048 tile!")
                 .font(.headline)
@@ -101,6 +110,7 @@ struct GameView: View {
         }
         .gesture(DragGesture(minimumDistance: 20).onEnded(handleSwipe))
         .overlay(gameOverOverlay)
+        .overlay(gameWonOverlay)
     }
     
     var backButton: some View {
@@ -127,6 +137,8 @@ struct GameView: View {
         addNumber()
         addNumber()
         isGameOver = false
+        isGameWon = false
+        endlessMode = false
     }
 
     private func addNumber() {
@@ -173,6 +185,7 @@ struct GameView: View {
             addNumber()
         }
         updateHighScore()
+        checkForGameWon()
         checkForGameOver()
     }
 
@@ -201,6 +214,7 @@ struct GameView: View {
             moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
+            checkForGameWon()
             checkForGameOver()
         }
     }
@@ -238,6 +252,7 @@ struct GameView: View {
             moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
+            checkForGameWon()
             checkForGameOver()
         }
     }
@@ -275,6 +290,7 @@ struct GameView: View {
             moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
+            checkForGameWon()
             checkForGameOver()
         }
     }
@@ -284,7 +300,15 @@ struct GameView: View {
     private func checkForGameOver() {
         if !grid.flatMap({ $0 }).contains(0) && !isMovePossible() {
             isGameOver = true
-            updateHighScore() // Ensure the high score is updated when the game is over
+        }
+        
+    }
+    
+    // Utility functions
+    private func checkForGameWon() {
+        if grid.flatMap({ $0 }).contains(2048) && !endlessMode {
+            print("Testing!!!")
+            isGameWon = true
         }
     }
     
@@ -359,7 +383,56 @@ struct GameView: View {
         }
     }
 
-    // Game Over Overlay
+    // Game won Overlay
+    private var gameWonOverlay: some View {
+        Group {
+            if isGameWon {
+                Color.black.opacity(0.75).edgesIgnoringSafeArea(.all)
+                VStack {
+                    Text("2048 Achieved!")
+                        .font(.largeTitle)
+                        .foregroundColor(.white)
+                        .padding()
+                    Text("Your score this game was \(score), your time was \(formatTime(gameTime)), you made \(moveCount) moves")
+                       .font(.headline)
+                       .foregroundColor(.white)
+                       .multilineTextAlignment(.center)
+                       .padding()
+                    Button("Restart") {
+                        isGameWon = false
+                        startNewGame()
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    Text("Endless mode - Go as far as you can!")
+                       .font(.headline)
+                       .foregroundColor(.white)
+                       .multilineTextAlignment(.center)
+                       .padding()
+                    Button("Continue") {
+                        isGameWon = false
+                        endlessMode = true
+                    }
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    Button("Main Menu") {
+                        // Add logic to navigate back to MainScreen
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .padding()
+                    .background(Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+            }
+        }
+    }
+    
+    // Game over Overlay
     private var gameOverOverlay: some View {
         Group {
             if isGameOver {
@@ -369,6 +442,11 @@ struct GameView: View {
                         .font(.largeTitle)
                         .foregroundColor(.white)
                         .padding()
+                    Text("Your score this game was \(score), your time was \(formatTime(gameTime)), you made \(moveCount) moves")
+                       .font(.headline)
+                       .foregroundColor(.white)
+                       .multilineTextAlignment(.center)
+                       .padding()
                     Button("Restart") {
                         isGameOver = false
                         startNewGame()
@@ -379,6 +457,7 @@ struct GameView: View {
                     .cornerRadius(10)
                     Button("Main Menu") {
                         // Add logic to navigate back to MainScreen
+                        presentationMode.wrappedValue.dismiss()
                     }
                     .padding()
                     .background(Color.gray)
