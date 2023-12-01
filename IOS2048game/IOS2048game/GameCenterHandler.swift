@@ -9,6 +9,7 @@ import Foundation
 import GameKit
 
 class GameCenterHandler {
+    // Function that authenticates the local user and displays a Game Center access point in the top-left corner.
     func authenticateUser() {
         let localPlayer = GKLocalPlayer.local
         localPlayer.authenticateHandler = { vc, err in
@@ -16,9 +17,9 @@ class GameCenterHandler {
                 print(err?.localizedDescription ?? "")
                 return
             }
-            GKAccessPoint.shared.location = .topLeading
-            GKAccessPoint.shared.showHighlights = true
-            GKAccessPoint.shared.isActive = localPlayer.isAuthenticated
+            GKAccessPoint.shared.location = .topLeading // Top-left corner
+            GKAccessPoint.shared.showHighlights = true // Displays highlights such as achievements or recent highscore
+            GKAccessPoint.shared.isActive = localPlayer.isAuthenticated // Enables or disables Game Center access point based on local player's authentication state
         }
     }
 }
