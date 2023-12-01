@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Binding var showingSettings: Bool // Binding to control the visibility from the MainScreen
-    @ObservedObject var playerManager: PlayerManager
+//    @ObservedObject var playerManager: PlayerManager
 
     var body: some View {
         VStack {
@@ -75,6 +75,8 @@ struct SettingsView: View {
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(showingSettings: .constant(true), playerManager: PlayerManager())
+//        SettingsView(showingSettings: .constant(true), playerManager: PlayerManager())
+        SettingsView(showingSettings: .constant(true))
+
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GameKit
 
 enum GridSize: Int, Hashable {
     case fourByFour = 4, fiveByFive = 5, sixBySix = 6
@@ -14,7 +15,9 @@ enum GridSize: Int, Hashable {
 struct MainScreen: View {
     
     @State private var showingSettings = false
-    @StateObject var playerManager = PlayerManager()
+    @State var gameCenterHandler = GameCenterHandler()
+    let localPlayer = GKLocalPlayer.local
+//    @StateObject var playerManager = PlayerManager()
     
     var body: some View {
         NavigationStack {
@@ -26,19 +29,22 @@ struct MainScreen: View {
 
                 Spacer()
 
-                NavigationLink("New Game - 4x4", destination: GameView(playerManager: playerManager, gridSize: .fourByFour))
+//                NavigationLink("New Game - 4x4", destination: GameView(playerManager: playerManager, gridSize: .fourByFour))
+                NavigationLink("New Game - 4x4", destination: GameView(gridSize: .fourByFour))
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
 
-                NavigationLink("New Game - 5x5", destination: GameView(playerManager: playerManager, gridSize: .fiveByFive))
+//                NavigationLink("New Game - 5x5", destination: GameView(playerManager: playerManager, gridSize: .fiveByFive))
+                NavigationLink("New Game - 5x5", destination: GameView(gridSize: .fiveByFive))
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
 
-                NavigationLink("New Game - 6x6", destination: GameView(playerManager: playerManager, gridSize: .sixBySix))
+//                NavigationLink("New Game - 6x6", destination: GameView(playerManager: playerManager, gridSize: .sixBySix))
+                NavigationLink("New Game - 6x6", destination: GameView(gridSize: .sixBySix))
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
@@ -79,12 +85,17 @@ struct MainScreen: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showingSettings) {
                 // This is the settings view that will be presented as a sheet.
-                SettingsView(showingSettings: $showingSettings, playerManager: playerManager)
+//                SettingsView(showingSettings: $showingSettings, playerManager: playerManager)
+                SettingsView(showingSettings: $showingSettings)
+
             }
         }
         .onAppear {
-            playerManager.authenticatePlayer()
+            gameCenterHandler.authenticateUser()
         }
+//        .onAppear {
+//            playerManager.authenticatePlayer()
+//        }
     }
 }
 

@@ -32,7 +32,7 @@ class PlayerManager: ObservableObject {
                 print(error.localizedDescription)
                 return
             }
-            
+
             if localPlayer.isAuthenticated {
                 authenticationState = .authenticated
             } else {
