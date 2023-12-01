@@ -2,7 +2,7 @@
 //  GameCenterHandler.swift
 //  IOS2048game
 //
-//  Created by Cody Peyerk on 11/30/23.
+//  Created by Caleb and Cody on 11/30/23.
 //
 
 import Foundation

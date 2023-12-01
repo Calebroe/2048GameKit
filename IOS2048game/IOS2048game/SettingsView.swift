@@ -2,14 +2,13 @@
 //  SettingsView.swift
 //  IOS2048game
 //
-//  Created by Caleb on 11/28/23.
+//  Created by Caleb and Cody on 11/28/23.
 //
 
 import SwiftUI
 
 struct SettingsView: View {
     @Binding var showingSettings: Bool // Binding to control the visibility from the MainScreen
-//    @ObservedObject var playerManager: PlayerManager
 
     var body: some View {
         VStack {
@@ -75,7 +74,6 @@ struct SettingsView: View {
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-//        SettingsView(showingSettings: .constant(true), playerManager: PlayerManager())
         SettingsView(showingSettings: .constant(true))
 
     }

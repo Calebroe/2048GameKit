@@ -2,7 +2,7 @@
 //  MainScreen.swift
 //  IOS2048game
 //
-//  Created by Caleb on 11/13/23.
+//  Created by Caleb and Cody on 11/13/23.
 //
 
 import SwiftUI
@@ -17,7 +17,6 @@ struct MainScreen: View {
     @State private var showingSettings = false
     @State var gameCenterHandler = GameCenterHandler()
     let localPlayer = GKLocalPlayer.local
-//    @StateObject var playerManager = PlayerManager()
     
     var body: some View {
         NavigationStack {
@@ -29,21 +28,18 @@ struct MainScreen: View {
 
                 Spacer()
 
-//                NavigationLink("New Game - 4x4", destination: GameView(playerManager: playerManager, gridSize: .fourByFour))
                 NavigationLink("New Game - 4x4", destination: GameView(gridSize: .fourByFour))
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
 
-//                NavigationLink("New Game - 5x5", destination: GameView(playerManager: playerManager, gridSize: .fiveByFive))
                 NavigationLink("New Game - 5x5", destination: GameView(gridSize: .fiveByFive))
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
 
-//                NavigationLink("New Game - 6x6", destination: GameView(playerManager: playerManager, gridSize: .sixBySix))
                 NavigationLink("New Game - 6x6", destination: GameView(gridSize: .sixBySix))
                     .padding()
                     .background(Color.blue)
@@ -85,7 +81,6 @@ struct MainScreen: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showingSettings) {
                 // This is the settings view that will be presented as a sheet.
-//                SettingsView(showingSettings: $showingSettings, playerManager: playerManager)
                 SettingsView(showingSettings: $showingSettings)
 
             }
@@ -93,9 +88,6 @@ struct MainScreen: View {
         .onAppear {
             gameCenterHandler.authenticateUser()
         }
-//        .onAppear {
-//            playerManager.authenticatePlayer()
-//        }
     }
 }
 

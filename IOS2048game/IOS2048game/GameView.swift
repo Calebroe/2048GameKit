@@ -2,13 +2,12 @@
 //  GameView.swift
 //  IOS2048game
 //
-//  Created by Caleb on 11/13/23.
+//  Created by Caleb and Cody on 11/13/23.
 //
 
 import SwiftUI
 
 struct GameView: View {
-//    @ObservedObject var playerManger: PlayerManager
     let gridSize: GridSize
     @State private var grid: [[Int]]
     @State private var score: Int = 0
@@ -21,10 +20,8 @@ struct GameView: View {
     @State private var gameTime = 0
         let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
-//    init(playerManager: PlayerManager, gridSize: GridSize) {
     init(gridSize: GridSize) {
         self.gridSize = gridSize
-//        self.playerManger = playerManager
         let size = gridSize.rawValue
         _grid = State(initialValue: Array(repeating: Array(repeating: 0, count: size), count: size))
     }
@@ -424,7 +421,6 @@ struct GameView: View {
 
 struct GameView_Previews: PreviewProvider {
     static var previews: some View {
-//        GameView(playerManager: PlayerManager(), gridSize: .fourByFour)
         GameView(gridSize: .fourByFour)
 
     }
