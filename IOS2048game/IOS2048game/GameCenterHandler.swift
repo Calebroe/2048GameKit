@@ -7,19 +7,59 @@
 
 import Foundation
 import GameKit
+import SwiftUI
 
-class GameCenterHandler {
-    // Function that authenticates the local user and displays a Game Center access point in the top-left corner.
-    func authenticateUser() {
-        let localPlayer = GKLocalPlayer.local
-        localPlayer.authenticateHandler = { vc, err in
-            guard err == nil else {
-                print(err?.localizedDescription ?? "")
+
+struct GameCenterAuthenticator: UIViewControllerRepresentable {
+    class Coordinator: NSObject, GKLocalPlayerListener {
+        var parent: GameCenterAuthenticator
+
+        init(parent: GameCenterAuthenticator) {
+            self.parent = parent
+        }
+
+        func player(_ player: GKPlayer, wantsToPresent viewController: UIViewController) {
+            parent.presentationController.present(viewController, animated: true, completion: nil)
+        }
+    }
+
+    var presentationController: UIViewController
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<GameCenterAuthenticator>) -> UIViewController {
+        return UIViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<GameCenterAuthenticator>) {
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(parent: self)
+    }
+}
+
+
+class GameCenterHandler: ObservableObject {
+    static let shared = GameCenterHandler()
+    var localPlayer = GKLocalPlayer.local
+    
+    @Published var isPresentingAuthView = false
+    
+    init() {
+        localPlayer.authenticateHandler = { viewController, error in
+            if viewController != nil {
+                // Set value to present view controller to authenticate user
+                GameCenterHandler.shared.isPresentingAuthView = true
+            } else if self.localPlayer.isAuthenticated {
+                // Player is authenticated
+                GKAccessPoint.shared.location = .topLeading
+                GKAccessPoint.shared.showHighlights = true
+                GKAccessPoint.shared.isActive = self.localPlayer.isAuthenticated
+            } else {
+                // Handle error
+                print(error?.localizedDescription ?? "")
                 return
             }
-            GKAccessPoint.shared.location = .topLeading // Top-left corner
-            GKAccessPoint.shared.showHighlights = true // Displays highlights such as achievements or recent highscore
-            GKAccessPoint.shared.isActive = localPlayer.isAuthenticated // Enables or disables Game Center access point based on local player's authentication state
         }
     }
 }
+

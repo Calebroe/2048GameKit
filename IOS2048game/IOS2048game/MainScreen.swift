@@ -13,10 +13,8 @@ enum GridSize: Int, Hashable {
 }
 
 struct MainScreen: View {
-    
+    @StateObject private var gameCenterHandler = GameCenterHandler()
     @State private var showingSettings = false
-    @State var gameCenterHandler = GameCenterHandler()
-    let localPlayer = GKLocalPlayer.local
     
     var body: some View {
         NavigationStack {
@@ -76,21 +74,28 @@ struct MainScreen: View {
                 }
 
                 Spacer()
+                
+                if gameCenterHandler.isPresentingAuthView {
+                    GameCenterAuthenticator(presentationController: UIApplication.shared.windows.first?.rootViewController ?? UIViewController())
+                            .edgesIgnoringSafeArea(.all)
+                            .onDisappear() {
+                                // Reset the view variable so it won't re-appear
+                                gameCenterHandler.isPresentingAuthView = false
+                            }
+                }
             }
             .navigationTitle("Main Menu")
             .navigationBarHidden(true)
             .sheet(isPresented: $showingSettings) {
                 // This is the settings view that will be presented as a sheet.
                 SettingsView(showingSettings: $showingSettings)
-
             }
-        }
-        .onAppear {
-            gameCenterHandler.authenticateUser()
+//            .sheet(isPresented: $showingAchievements) {
+//                gameCenterHandler.showAchievements()
+//            }
         }
     }
 }
-
 
 
 struct MainScreen_Previews: PreviewProvider {
