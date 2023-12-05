@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		18640EAC2B1926CD00B2E9A2 /* GameCenterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18640EAB2B1926CD00B2E9A2 /* GameCenterHandler.swift */; };
+		18640EED2B1F5F1D00B2E9A2 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18640EEC2B1F5F1D00B2E9A2 /* LeaderboardView.swift */; };
+		18640EEF2B1F5FAB00B2E9A2 /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18640EEE2B1F5FAB00B2E9A2 /* AchievementsView.swift */; };
 		3C3342532B16E829000714D3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3342522B16E829000714D3 /* SettingsView.swift */; };
 		3C7C76C82B02C5090063C5EF /* IOS2048gameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C76C72B02C5090063C5EF /* IOS2048gameApp.swift */; };
 		3C7C76CA2B02C5090063C5EF /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7C76C92B02C5090063C5EF /* GameView.swift */; };
@@ -19,6 +21,8 @@
 /* Begin PBXFileReference section */
 		18640EA42B17F72800B2E9A2 /* IOS2048game.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IOS2048game.entitlements; sourceTree = "<group>"; };
 		18640EAB2B1926CD00B2E9A2 /* GameCenterHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterHandler.swift; sourceTree = "<group>"; };
+		18640EEC2B1F5F1D00B2E9A2 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
+		18640EEE2B1F5FAB00B2E9A2 /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
 		3C3342522B16E829000714D3 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3C7C76C42B02C5090063C5EF /* IOS2048game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IOS2048game.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C7C76C72B02C5090063C5EF /* IOS2048gameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOS2048gameApp.swift; sourceTree = "<group>"; };
@@ -63,6 +67,8 @@
 				3C7C76D52B02CAA10063C5EF /* MainScreen.swift */,
 				3C7C76C92B02C5090063C5EF /* GameView.swift */,
 				3C3342522B16E829000714D3 /* SettingsView.swift */,
+				18640EEE2B1F5FAB00B2E9A2 /* AchievementsView.swift */,
+				18640EEC2B1F5F1D00B2E9A2 /* LeaderboardView.swift */,
 				18640EAB2B1926CD00B2E9A2 /* GameCenterHandler.swift */,
 				3C7C76CB2B02C50B0063C5EF /* Assets.xcassets */,
 				3C7C76CD2B02C50B0063C5EF /* Preview Content */,
@@ -150,8 +156,10 @@
 			files = (
 				3C7C76D62B02CAA10063C5EF /* MainScreen.swift in Sources */,
 				18640EAC2B1926CD00B2E9A2 /* GameCenterHandler.swift in Sources */,
+				18640EEF2B1F5FAB00B2E9A2 /* AchievementsView.swift in Sources */,
 				3C3342532B16E829000714D3 /* SettingsView.swift in Sources */,
 				3C7C76CA2B02C5090063C5EF /* GameView.swift in Sources */,
+				18640EED2B1F5F1D00B2E9A2 /* LeaderboardView.swift in Sources */,
 				3C7C76C82B02C5090063C5EF /* IOS2048gameApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
