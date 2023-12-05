@@ -61,5 +61,55 @@ class GameCenterHandler: ObservableObject {
             }
         }
     }
+    
+    // Report highscores to Game Center
+    func reportScore(score: Int, leaderboardID: String) {
+        if GKLocalPlayer.local.isAuthenticated {
+            let leaderboardScore = GKLeaderboardScore()
+            leaderboardScore.leaderboardID = leaderboardID
+            leaderboardScore.value = score
+            leaderboardScore.player = self.localPlayer
+
+            GKLeaderboard.loadLeaderboards(IDs: [leaderboardID]) { (leaderboards, error) in
+                if let error = error {
+                    print("Error loading leaderboards: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let leaderboard = leaderboards?.first else {
+                    print("Leaderboard not found")
+                    return
+                }
+
+                GKLeaderboard.submitScore(Int(leaderboardScore.value), context: 0, player: leaderboardScore.player, leaderboardIDs: [leaderboardScore.leaderboardID]) { (error) in
+                    if let error = error {
+                        print("Error reporting score: \(error.localizedDescription)")
+                    } else {
+                        print("Score reported successfully!")
+                    }
+                }
+            }
+        } else {
+            print("Player is not authenticated.")
+        }
+    }
+    
+    // Report achievements to Game Center
+    func reportAchievement(achievementID: String, percentComplete: Double) {
+        if GKLocalPlayer.local.isAuthenticated {
+            let achievement = GKAchievement(identifier: achievementID)
+            achievement.percentComplete = percentComplete
+
+            GKAchievement.report([achievement]) { (error) in
+                if let error = error {
+                    print("Error reporting achievement: \(error.localizedDescription)")
+                } else {
+                    print("Achievement reported successfully!")
+                }
+            }
+        } else {
+            print("Player is not authenticated.")
+        }
+    }
 }
 
