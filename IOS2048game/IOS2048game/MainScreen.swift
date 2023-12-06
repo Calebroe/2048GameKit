@@ -2,21 +2,18 @@
 //  MainScreen.swift
 //  IOS2048game
 //
-//  Created by Caleb and Cody on 11/13/23.
+//  Created by Caleb on 11/13/23.
 //
 
 import SwiftUI
-import GameKit
 
 enum GridSize: Int, Hashable {
     case fourByFour = 4, fiveByFive = 5, sixBySix = 6
 }
 
 struct MainScreen: View {
-    @StateObject private var gameCenterHandler = GameCenterHandler()
+    
     @State private var showingSettings = false
-    @State private var showingLeaderboard = false
-    @State private var showingAchievements = false
     
     var body: some View {
         NavigationStack {
@@ -64,13 +61,11 @@ struct MainScreen: View {
                     HStack {
                         Button("LeaderBoard") {
                             // Action to show leaderboard
-                            showingLeaderboard = true
                         }
                         .padding()
 
                         Button("Achievements") {
                             // Action to show achievements
-                            showingAchievements = true
                         }
                         .padding()
                     }
@@ -78,15 +73,6 @@ struct MainScreen: View {
                 }
 
                 Spacer()
-                
-                if gameCenterHandler.isPresentingAuthView {
-                    GameCenterAuthenticator(presentationController: UIApplication.shared.windows.first?.rootViewController ?? UIViewController())
-                            .edgesIgnoringSafeArea(.all)
-                            .onDisappear() {
-                                // Reset the view variable so it won't re-appear
-                                gameCenterHandler.isPresentingAuthView = false
-                            }
-                }
             }
             .navigationTitle("Main Menu")
             .navigationBarHidden(true)
@@ -94,24 +80,10 @@ struct MainScreen: View {
                 // This is the settings view that will be presented as a sheet.
                 SettingsView(showingSettings: $showingSettings)
             }
-            .sheet(isPresented: $showingAchievements) {
-                // This is the achievements view that will be presented as a sheet.
-                AchievementsView()
-                    .onDisappear() {
-                        showingAchievements = false
-                    }
-            }
-            // TODO: Get leaderboard identifier
-            .sheet(isPresented: $showingLeaderboard) {
-                // This is the leaderboards view that will be presented as a sheet.
-                LeaderboardView(leaderboardIdentifier: "HELP")
-                    .onDisappear() {
-                        showingLeaderboard = false
-                    }
-            }
         }
     }
 }
+
 
 
 struct MainScreen_Previews: PreviewProvider {

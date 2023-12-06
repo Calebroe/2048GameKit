@@ -2,7 +2,7 @@
 //  GameView.swift
 //  IOS2048game
 //
-//  Created by Caleb and Cody on 11/13/23.
+//  Created by Caleb on 11/13/23.
 //
 
 import SwiftUI
@@ -500,6 +500,5 @@ struct GameView: View {
 struct GameView_Previews: PreviewProvider {
     static var previews: some View {
         GameView(gridSize: .fourByFour)
-
     }
 }
