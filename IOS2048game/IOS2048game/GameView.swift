@@ -306,8 +306,7 @@ struct GameView: View {
     
     // Utility functions
     private func checkForGameWon() {
-        if grid.flatMap({ $0 }).contains(2048) && !endlessMode {
-            print("Testing!!!")
+        if grid.flatMap({ $0 }).contains(16) && !endlessMode {
             isGameWon = true
         }
     }
