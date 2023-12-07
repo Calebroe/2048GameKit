@@ -10,6 +10,9 @@ import GameKit
 
 
 struct AchievementsView: UIViewControllerRepresentable {
+    
+    let delegate = GameCenterViewControllerDelegate()
+
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
         showAchievements(viewController: viewController)
@@ -20,7 +23,7 @@ struct AchievementsView: UIViewControllerRepresentable {
 
     private func showAchievements(viewController: UIViewController) {
         let achievementsViewController = GKGameCenterViewController()
-        achievementsViewController.gameCenterDelegate = viewController as? GKGameCenterControllerDelegate
+        achievementsViewController.gameCenterDelegate = delegate
         achievementsViewController.viewState = .achievements
 
         viewController.present(achievementsViewController, animated: true, completion: nil)

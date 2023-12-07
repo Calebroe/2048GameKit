@@ -99,7 +99,7 @@ class GameCenterHandler: ObservableObject {
         if GKLocalPlayer.local.isAuthenticated {
             let achievement = GKAchievement(identifier: achievementID)
             achievement.percentComplete = percentComplete
-
+            achievement.showsCompletionBanner = true // This will show the default UI banner
             GKAchievement.report([achievement]) { (error) in
                 if let error = error {
                     print("Error reporting achievement: \(error.localizedDescription)")
@@ -113,3 +113,8 @@ class GameCenterHandler: ObservableObject {
     }
 }
 
+class GameCenterViewControllerDelegate: NSObject, GKGameCenterControllerDelegate {
+    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+        gameCenterViewController.dismiss(animated: true, completion: nil)
+    }
+}

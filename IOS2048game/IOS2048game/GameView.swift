@@ -6,56 +6,37 @@
 //
 
 import SwiftUI
+import GameKit
 
 struct GameView: View {
     let gridSize: GridSize
     @State private var grid: [[Int]]
     @State private var score: Int = 0
+    @State private var gameTime = 0
     @State private var highScore: Int = 0 // Initialized later
     @State private var moveCount: Int = 0
     @State private var isGameOver = false
     @State private var isGameWon = false
     @State private var endlessMode = false
-
-    @Environment(\.presentationMode) var presentationMode
+    @StateObject private var gameCenterHandler = GameCenterHandler() // This needs to be in scope
+    @State private var gameStarted = false // Example state to track if the game has started
+    @State private var timer: Timer?
+    @State private var highestTile = 0
     
-    @State private var gameTime = 0
-        let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @Environment(\.presentationMode) var presentationMode
     
     init(gridSize: GridSize) {
         self.gridSize = gridSize
         let size = gridSize.rawValue
         _grid = State(initialValue: Array(repeating: Array(repeating: 0, count: size), count: size))
     }
-
+    
     var body: some View {
         VStack(spacing: 20) {
-            // Big 2048 title with each letter in different color
-            HStack(spacing: 0) {
-                Text("2").font(.largeTitle).fontWeight(.heavy).foregroundColor(.red)
-                Text("0").font(.largeTitle).fontWeight(.heavy).foregroundColor(.green)
-                Text("4").font(.largeTitle).fontWeight(.heavy).foregroundColor(.blue)
-                Text("8").font(.largeTitle).fontWeight(.heavy).foregroundColor(.orange)
-            }
-
-            if endlessMode {
-                // Subtitle text
-                Text("Endless Mode!!")
-                    .font(.headline)
-                    .foregroundColor(.red)
-
-            }
-            // Subtitle text
-            Text("Merge tiles to get the 2048 tile!")
-                .font(.headline)
-                .foregroundColor(.gray)
-
-            // Score and High Score display
-            HStack {
-                scoreView(title: "SCORE", score: score)
-                scoreView(title: "HIGH SCORE", score: highScore)
-            }
-
+            gameTitle
+            modeText
+            scoreRow
+            
             VStack(spacing: 5) {
                 ForEach(0..<grid.count, id: \.self) { i in
                     HStack(spacing: 5) {
@@ -72,36 +53,15 @@ struct GameView: View {
             }
             .background(Color.black.opacity(0.5))
             .cornerRadius(10)
-            // Time and Move Count in HStack
-            HStack {
-                Text("Time: \(formatTime(gameTime))")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading) // Aligns to left
-
-                Text("Moves: \(moveCount)")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .trailing) // Aligns to right
-            }
-
             
-            Button("New Game") {
-                startNewGame()
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
+            timeAndMoveCount
+            newGameButton
         }
         .padding()
         .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    backButton
-                }
-            }
-        .onReceive(timer) { _ in
-            if !isGameOver {
-                gameTime += 1
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                backButton
             }
         }
         .onAppear {
@@ -114,18 +74,18 @@ struct GameView: View {
     }
     
     var backButton: some View {
-       Button(action: {
-           presentationMode.wrappedValue.dismiss()
-       }) {
-           HStack {
-               Text("Main Menu")
-           }
-           .foregroundColor(.white)
-           .padding(5)
-           .background(Color.gray)
-           .cornerRadius(8)
-       }
-   }
+        Button(action: {
+            presentationMode.wrappedValue.dismiss()
+        }) {
+            HStack {
+                Text("Main Menu")
+            }
+            .foregroundColor(.white)
+            .padding(5)
+            .background(Color.gray)
+            .cornerRadius(8)
+        }
+    }
 
     // Game Logic
     private func startNewGame() {
@@ -139,6 +99,9 @@ struct GameView: View {
         isGameOver = false
         isGameWon = false
         endlessMode = false
+        gameStarted = true
+        checkForAchievements()
+        startGameTimer()
     }
 
     private func addNumber() {
@@ -154,7 +117,6 @@ struct GameView: View {
             grid[x][y] = Int.random(in: 1...2) * 2
         }
     }
-
 
     // Movement and merging logic
     private func moveRight() {
@@ -185,8 +147,10 @@ struct GameView: View {
             addNumber()
         }
         updateHighScore()
+        updateTotalPlayTime()
         checkForGameWon()
         checkForGameOver()
+        checkForAchievements()
     }
 
     private func moveLeft() {
@@ -214,8 +178,10 @@ struct GameView: View {
             moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
+            updateTotalPlayTime()
             checkForGameWon()
             checkForGameOver()
+            checkForAchievements()
         }
     }
 
@@ -252,8 +218,10 @@ struct GameView: View {
             moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
+            updateTotalPlayTime()
             checkForGameWon()
             checkForGameOver()
+            checkForAchievements()
         }
     }
 
@@ -290,26 +258,124 @@ struct GameView: View {
             moveCount += 1 // Increment move count
             addNumber()
             updateHighScore()
+            updateTotalPlayTime()
             checkForGameWon()
             checkForGameOver()
+            checkForAchievements()
         }
     }
-
-
+    
     // Utility functions
     private func checkForGameOver() {
         if !grid.flatMap({ $0 }).contains(0) && !isMovePossible() {
             isGameOver = true
+            stopGameTimer()
+            
         }
         
     }
     
-    // Utility functions
     private func checkForGameWon() {
         if grid.flatMap({ $0 }).contains(2048) && !endlessMode {
             print("Testing!!!")
             isGameWon = true
         }
+    }
+    
+    private func checkForHighestTile() {
+        if grid.flatMap({ $0 }).contains(256) {
+            highestTile = 256
+        }
+        if grid.flatMap({ $0 }).contains(512) {
+            highestTile = 512
+        }
+        if grid.flatMap({ $0 }).contains(1024) {
+            highestTile = 1024
+        }
+        if grid.flatMap({ $0 }).contains(2048) {
+            highestTile = 2048
+        }
+    }
+    
+    private func checkForAchievements() {
+        // Example conditions
+        if gameStarted {
+            gameCenterHandler.reportAchievement(achievementID: "startFirstGame", percentComplete: 100)
+        }
+        if isGameOver {
+            gameCenterHandler.reportAchievement(achievementID: "finishFirstGame", percentComplete: 100)
+        }
+        if isGameWon {
+            gameCenterHandler.reportAchievement(achievementID: "wonFirstGame", percentComplete: 100)
+        }
+        
+        checkForHighestTile()
+        
+        if highestTile >= 256 {
+            gameCenterHandler.reportAchievement(achievementID: "tile256", percentComplete: 100)
+        }
+        if highestTile >= 512 {
+            gameCenterHandler.reportAchievement(achievementID: "tile512", percentComplete: 100)
+        }
+        if highestTile >= 1024 {
+            gameCenterHandler.reportAchievement(achievementID: "tile1024", percentComplete: 100)
+        }
+        if highestTile >= 2048 {
+            gameCenterHandler.reportAchievement(achievementID: "tile2048", percentComplete: 100)
+        }
+        // Check for time-based achievements
+        let totalPlayTime = retrieveTotalPlayTime() // Retrieve this from persistent storage
+        checkTimeBasedAchievements(playTime: totalPlayTime)
+    }
+    
+    private func checkTimeBasedAchievements(playTime: Int) {
+        // Time is in seconds, so convert hours to seconds for comparison
+        if playTime >= 1 * 3600 { // 1 hour
+            gameCenterHandler.reportAchievement(achievementID: "hour1Playtime", percentComplete: 100)
+        }
+        if playTime >= 10 * 3600 { // 10 hours
+            gameCenterHandler.reportAchievement(achievementID: "hour10Playtime", percentComplete: 100)
+        }
+        if playTime >= 25 * 3600 { // 25 hours
+            gameCenterHandler.reportAchievement(achievementID: "hour25Playtime", percentComplete: 100)
+        }
+        if playTime >= 50 * 3600 { // 50 hours
+            gameCenterHandler.reportAchievement(achievementID: "hour50Playtime", percentComplete: 100)
+        }
+        if playTime >= 75 * 3600 { // 75 hours
+            gameCenterHandler.reportAchievement(achievementID: "hour75Playtime", percentComplete: 100)
+        }
+        if playTime >= 100 * 3600 { // 100 hours
+            gameCenterHandler.reportAchievement(achievementID: "hour100Playtime", percentComplete: 100)
+        }
+        // ... Add checks for other time-based achievements
+    }
+
+    private func retrieveTotalPlayTime() -> Int {
+        // Retrieve the total playtime from UserDefaults or your own persistence layer
+        // Example:
+        return UserDefaults.standard.integer(forKey: "TotalPlayTime")
+    }
+    
+    // Start a timer when the game starts
+    private func startGameTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            self.gameTime += 1
+        }
+    }
+
+    // Call this function to update the total play time in UserDefaults
+    private func updateTotalPlayTime() {
+        let currentTotalPlayTime = UserDefaults.standard.integer(forKey: "TotalPlayTime")
+        let newTotalPlayTime = currentTotalPlayTime + gameTime
+        UserDefaults.standard.set(newTotalPlayTime, forKey: "TotalPlayTime")
+    }
+
+    // Call this function when the game ends or pauses
+    private func stopGameTimer() {
+        timer?.invalidate()
+        timer = nil
+        updateTotalPlayTime() // Make sure to update the total play time when the game ends
     }
     
     private func formatTime(_ totalSeconds: Int) -> String {
@@ -496,6 +562,55 @@ struct GameView: View {
             return "\(score)"
         }
     }
+}
+
+extension GameView {
+    var gameTitle: some View {
+        HStack(spacing: 0) {
+            Text("2").font(.largeTitle).fontWeight(.heavy).foregroundColor(.red)
+            Text("0").font(.largeTitle).fontWeight(.heavy).foregroundColor(.green)
+            Text("4").font(.largeTitle).fontWeight(.heavy).foregroundColor(.blue)
+            Text("8").font(.largeTitle).fontWeight(.heavy).foregroundColor(.orange)
+        }
+    }
+    
+    var modeText: some View {
+        Group {
+            if endlessMode {
+                Text("Endless Mode!!")
+                    .font(.headline)
+                    .foregroundColor(.red)
+            }
+        }
+    }
+    
+    var scoreRow: some View {
+        HStack {
+            scoreView(title: "SCORE", score: score)
+            scoreView(title: "HIGH SCORE", score: highScore)
+        }
+    }
+    
+    var timeAndMoveCount: some View {
+            HStack {
+                Text("Time: \(formatTime(gameTime))")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("Moves: \(moveCount)")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+
+        var newGameButton: some View {
+            Button("New Game") {
+                startNewGame()
+            }
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+        }
 }
 
 struct GameView_Previews: PreviewProvider {

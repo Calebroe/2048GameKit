@@ -18,6 +18,8 @@ struct MainScreen: View {
     @State private var showingLeaderboard = false
     @State private var showingAchievements = false
     
+    private let gameCenterDelegate = GameCenterViewControllerDelegate()
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -64,13 +66,13 @@ struct MainScreen: View {
                     HStack {
                         Button("LeaderBoard") {
                             // Action to show leaderboard
-                            showingLeaderboard = true
+                            showLeaderboard()
                         }
                         .padding()
 
                         Button("Achievements") {
                             // Action to show achievements
-                            showingAchievements = true
+                            showAchievements()
                         }
                         .padding()
                     }
@@ -94,24 +96,28 @@ struct MainScreen: View {
                 // This is the settings view that will be presented as a sheet.
                 SettingsView(showingSettings: $showingSettings)
             }
-            .sheet(isPresented: $showingAchievements) {
-                // This is the achievements view that will be presented as a sheet.
-                AchievementsView()
-                    .onDisappear() {
-                        showingAchievements = false
-                    }
-            }
-            // TODO: Get leaderboard identifier
-            .sheet(isPresented: $showingLeaderboard) {
-                // This is the leaderboards view that will be presented as a sheet.
-                LeaderboardView(leaderboardIdentifier: "HELP")
-                    .onDisappear() {
-                        showingLeaderboard = false
-                    }
-            }
         }
     }
+    
+    private func showAchievements() {
+           guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else { return }
+           let achievementsViewController = GKGameCenterViewController()
+           achievementsViewController.gameCenterDelegate = gameCenterDelegate
+           achievementsViewController.viewState = .achievements
+           rootViewController.present(achievementsViewController, animated: true, completion: nil)
+       }
+
+    private func showLeaderboard() {
+       guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else { return }
+       let leaderboardViewController = GKGameCenterViewController(state: .leaderboards)
+       leaderboardViewController.gameCenterDelegate = gameCenterDelegate
+       // Set your leaderboard identifier
+       leaderboardViewController.leaderboardIdentifier = "Your_Leaderboard_Identifier"
+       rootViewController.present(leaderboardViewController, animated: true, completion: nil)
+    }
 }
+
+
 
 
 struct MainScreen_Previews: PreviewProvider {

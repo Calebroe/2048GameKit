@@ -11,6 +11,7 @@ import GameKit
 
 struct LeaderboardView: UIViewControllerRepresentable {
     var leaderboardIdentifier: String
+    let gameCenterDelegate = GameCenterViewControllerDelegate()
 
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
@@ -22,7 +23,7 @@ struct LeaderboardView: UIViewControllerRepresentable {
 
     private func showLeaderboard(viewController: UIViewController) {
         let leaderboardViewController = GKGameCenterViewController(state: .leaderboards)
-        leaderboardViewController.gameCenterDelegate = viewController as? GKGameCenterControllerDelegate
+        leaderboardViewController.gameCenterDelegate = gameCenterDelegate
         leaderboardViewController.leaderboardIdentifier = leaderboardIdentifier
 
         viewController.present(leaderboardViewController, animated: true, completion: nil)
