@@ -49,11 +49,11 @@ class GameCenterHandler: ObservableObject {
             if viewController != nil {
                 // Set value to present view controller to authenticate user
                 GameCenterHandler.shared.isPresentingAuthView = true
-            } else if self.localPlayer.isAuthenticated {
+            //} else if self.localPlayer.isAuthenticated {
                 // Player is authenticated
-                GKAccessPoint.shared.location = .topLeading
-                GKAccessPoint.shared.showHighlights = true
-                GKAccessPoint.shared.isActive = self.localPlayer.isAuthenticated
+                //GKAccessPoint.shared.location = .topLeading
+                //GKAccessPoint.shared.showHighlights = true
+                //GKAccessPoint.shared.isActive = self.localPlayer.isAuthenticated
             } else {
                 // Handle error
                 print(error?.localizedDescription ?? "")

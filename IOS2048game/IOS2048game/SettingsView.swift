@@ -31,7 +31,7 @@ struct SettingsView: View {
             
             // Other settings options...
             Button("Reset Highscore") {
-                //logic to reset highscore
+                resetLocalData()
             }
             .padding()
             .background(Color.black)
@@ -70,6 +70,13 @@ struct SettingsView: View {
             }
         )
     }
+}
+
+private func resetLocalData() {
+    UserDefaults.standard.set(0, forKey: "highScore4x4")
+    UserDefaults.standard.set(0, forKey: "highScore5x5")
+    UserDefaults.standard.set(0, forKey: "highScore6x6")
+    UserDefaults.standard.set(0, forKey: "TotalPlayTime")
 }
 
 struct SettingsView_Previews: PreviewProvider {

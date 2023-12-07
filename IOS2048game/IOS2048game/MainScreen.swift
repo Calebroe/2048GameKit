@@ -23,11 +23,13 @@ struct MainScreen: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Text("2048")
-                    .font(.largeTitle)
-                    .fontWeight(.heavy)
-                    .padding(.top, 50)
-
+                HStack(spacing: 0) {
+                    Text("2").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.red)
+                    Text("0").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.green)
+                    Text("4").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.blue)
+                    Text("8").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.orange)
+                }
+                .padding(100)
                 Spacer()
 
                 NavigationLink("New Game - 4x4", destination: GameView(gridSize: .fourByFour))

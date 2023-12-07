@@ -102,8 +102,22 @@ struct GameView: View {
         gameStarted = true
         checkForAchievements()
         startGameTimer()
+        updateGlobalScore()
     }
 
+    private func updateGlobalScore() {
+        if GKLocalPlayer.local.isAuthenticated {
+            let currentHighScore = UserDefaults.standard.integer(forKey: highScoreKey)
+            let leaderboardScore = GKLeaderboardScore()
+            leaderboardScore.player = GKLocalPlayer.local
+            leaderboardScore.leaderboardID = "highestScore"
+            if currentHighScore > leaderboardScore.value {
+                print("\(leaderboardScore.value)")
+                gameCenterHandler.reportScore(score: currentHighScore, leaderboardID: "highestScore")
+            }
+        }
+    }
+    
     private func addNumber() {
         var emptyCells = [(Int, Int)]()
         for i in 0..<grid.count {
@@ -270,15 +284,15 @@ struct GameView: View {
         if !grid.flatMap({ $0 }).contains(0) && !isMovePossible() {
             isGameOver = true
             stopGameTimer()
-            
+            reportHighScore()
         }
-        
     }
     
     private func checkForGameWon() {
         if grid.flatMap({ $0 }).contains(2048) && !endlessMode {
             print("Testing!!!")
             isGameWon = true
+            reportHighScore()
         }
     }
     
@@ -306,7 +320,7 @@ struct GameView: View {
             gameCenterHandler.reportAchievement(achievementID: "finishFirstGame", percentComplete: 100)
         }
         if isGameWon {
-            gameCenterHandler.reportAchievement(achievementID: "wonFirstGame", percentComplete: 100)
+            gameCenterHandler.reportAchievement(achievementID: "winFirstGame", percentComplete: 100)
         }
         
         checkForHighestTile()
@@ -449,6 +463,10 @@ struct GameView: View {
         }
     }
 
+    private func reportHighScore() {
+        gameCenterHandler.reportScore(score: score, leaderboardID: "highestScore")
+    }
+    
     // Game won Overlay
     private var gameWonOverlay: some View {
         Group {
@@ -567,10 +585,10 @@ struct GameView: View {
 extension GameView {
     var gameTitle: some View {
         HStack(spacing: 0) {
-            Text("2").font(.largeTitle).fontWeight(.heavy).foregroundColor(.red)
-            Text("0").font(.largeTitle).fontWeight(.heavy).foregroundColor(.green)
-            Text("4").font(.largeTitle).fontWeight(.heavy).foregroundColor(.blue)
-            Text("8").font(.largeTitle).fontWeight(.heavy).foregroundColor(.orange)
+            Text("2").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.red)
+            Text("0").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.green)
+            Text("4").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.blue)
+            Text("8").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.orange)
         }
     }
     
