@@ -49,11 +49,8 @@ class GameCenterHandler: ObservableObject {
             if viewController != nil {
                 // Set value to present view controller to authenticate user
                 GameCenterHandler.shared.isPresentingAuthView = true
-            //} else if self.localPlayer.isAuthenticated {
-                // Player is authenticated
-                //GKAccessPoint.shared.location = .topLeading
-                //GKAccessPoint.shared.showHighlights = true
-                //GKAccessPoint.shared.isActive = self.localPlayer.isAuthenticated
+            } else if self.localPlayer.isAuthenticated {
+                 // Player is authenticated
             } else {
                 // Handle error
                 print(error?.localizedDescription ?? "")
@@ -64,7 +61,7 @@ class GameCenterHandler: ObservableObject {
     
     // Report highscores to Game Center
     func reportScore(score: Int, leaderboardID: String) {
-        if GKLocalPlayer.local.isAuthenticated {
+        if localPlayer.isAuthenticated {
             let leaderboardScore = GKLeaderboardScore()
             leaderboardScore.leaderboardID = leaderboardID
             leaderboardScore.value = score
@@ -96,10 +93,11 @@ class GameCenterHandler: ObservableObject {
     
     // Report achievements to Game Center
     func reportAchievement(achievementID: String, percentComplete: Double) {
-        if GKLocalPlayer.local.isAuthenticated {
+        if localPlayer.isAuthenticated {
             let achievement = GKAchievement(identifier: achievementID)
             achievement.percentComplete = percentComplete
             achievement.showsCompletionBanner = true // This will show the default UI banner
+            
             GKAchievement.report([achievement]) { (error) in
                 if let error = error {
                     print("Error reporting achievement: \(error.localizedDescription)")

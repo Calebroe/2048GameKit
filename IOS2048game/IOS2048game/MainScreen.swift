@@ -23,6 +23,15 @@ struct MainScreen: View {
     var body: some View {
         NavigationStack {
             VStack {
+                if gameCenterHandler.isPresentingAuthView {
+                    GameCenterAuthenticator(presentationController: UIApplication.shared.windows.first?.rootViewController ?? UIViewController())
+                            .edgesIgnoringSafeArea(.all)
+                            .onDisappear() {
+                                // Reset the view variable so it won't re-appear
+                                gameCenterHandler.isPresentingAuthView = false
+                            }
+                }
+                
                 HStack(spacing: 0) {
                     Text("2").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.red)
                     Text("0").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.green)
@@ -82,15 +91,6 @@ struct MainScreen: View {
                 }
 
                 Spacer()
-                
-                if gameCenterHandler.isPresentingAuthView {
-                    GameCenterAuthenticator(presentationController: UIApplication.shared.windows.first?.rootViewController ?? UIViewController())
-                            .edgesIgnoringSafeArea(.all)
-                            .onDisappear() {
-                                // Reset the view variable so it won't re-appear
-                                gameCenterHandler.isPresentingAuthView = false
-                            }
-                }
             }
             .navigationTitle("Main Menu")
             .navigationBarHidden(true)
