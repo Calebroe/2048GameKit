@@ -141,7 +141,6 @@ struct GameView: View {
             }
             line = line.filter { $0 != 0 }
             line = Array(repeating: 0, count: grid[i].count - line.count) + line
-            
             if grid[i] != line {
                 moved = true
                 grid[i] = line
@@ -150,12 +149,12 @@ struct GameView: View {
         if moved {
             moveCount += 1 // Increment move count
             addNumber()
+            updateHighScore()
+            updateTotalPlayTime()
+            checkForGameWon()
+            checkForGameOver()
+            checkForAchievements()
         }
-        updateHighScore()
-        updateTotalPlayTime()
-        checkForGameWon()
-        checkForGameOver()
-        checkForAchievements()
     }
 
     private func moveLeft() {
