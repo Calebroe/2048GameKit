@@ -9,12 +9,14 @@ import SwiftUI
 
 @main
 struct IOS2048gameApp: App {
+    // State object for Game Center
     @StateObject private var gameCenterHandler = GameCenterHandler()
     
     var body: some Scene {
         WindowGroup {
             MainScreen()
                 .onAppear() {
+                    // If isPresentingAuthView is true, present the Game Center login/authentication view
                     if gameCenterHandler.isPresentingAuthView {
                         GameCenterAuthenticator(presentationController: UIApplication.shared.windows.first?.rootViewController ?? UIViewController())
                                 .edgesIgnoringSafeArea(.all)

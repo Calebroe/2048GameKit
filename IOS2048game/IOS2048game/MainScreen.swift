@@ -14,15 +14,12 @@ enum GridSize: Int, Hashable {
 
 struct MainScreen: View {
     @StateObject private var gameCenterHandler = GameCenterHandler()
-    @State private var showingSettings = false
-    @State private var showingLeaderboard = false
-    @State private var showingAchievements = false
-    
     private let gameCenterDelegate = GameCenterViewControllerDelegate()
     
     var body: some View {
         NavigationStack {
             VStack {
+                // Checks if the authentication view needs to be presented
                 if gameCenterHandler.isPresentingAuthView {
                     GameCenterAuthenticator(presentationController: UIApplication.shared.windows.first?.rootViewController ?? UIViewController())
                             .edgesIgnoringSafeArea(.all)
@@ -39,8 +36,10 @@ struct MainScreen: View {
                     Text("8").font(.system(size: 60)).fontWeight(.heavy).foregroundColor(.orange)
                 }
                 .padding(100)
+                
                 Spacer()
 
+                // Simple navigation buttons that will bring user to the GameView
                 NavigationLink("New Game - 4x4", destination: GameView(gridSize: .fourByFour))
                     .padding()
                     .background(Color.blue)
@@ -59,16 +58,6 @@ struct MainScreen: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
                     .padding(.bottom)
-
-                // Continue Game and Settings buttons...
-                // Settings button with drop-down menu
-                Button("Settings") {
-                    showingSettings = true
-                }
-                .padding()
-                .background(Color.gray)
-                .foregroundColor(.white)
-                .cornerRadius(8)
 
                 Spacer()
 
@@ -94,34 +83,34 @@ struct MainScreen: View {
             }
             .navigationTitle("Main Menu")
             .navigationBarHidden(true)
-            .sheet(isPresented: $showingSettings) {
-                // This is the settings view that will be presented as a sheet.
-                SettingsView(showingSettings: $showingSettings)
-            }
         }
     }
     
+    // Function to show the achievements viewController
     private func showAchievements() {
-           guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else { return }
-           let achievementsViewController = GKGameCenterViewController()
-           achievementsViewController.gameCenterDelegate = gameCenterDelegate
-           achievementsViewController.viewState = .achievements
-           rootViewController.present(achievementsViewController, animated: true, completion: nil)
-       }
+        guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else { return }
+        // Create GameCenterViewController with the state of .achievements
+        let achievementsViewController = GKGameCenterViewController(state: .achievements)
+        achievementsViewController.gameCenterDelegate = gameCenterDelegate
+        // Present the achievementsViewController
+        rootViewController.present(achievementsViewController, animated: true, completion: nil)
+    }
 
+    // Function to show the leaderboard viewController
     private func showLeaderboard() {
-       guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else { return }
-       let leaderboardViewController = GKGameCenterViewController(state: .leaderboards)
-       leaderboardViewController.gameCenterDelegate = gameCenterDelegate
-       // Set your leaderboard identifier
-       leaderboardViewController.leaderboardIdentifier = "Your_Leaderboard_Identifier"
-       rootViewController.present(leaderboardViewController, animated: true, completion: nil)
+        guard let rootViewController = UIApplication.shared.windows.first?.rootViewController else { return }
+        // Create GameCenterViewController with the state of .leaderboards
+        let leaderboardViewController = GKGameCenterViewController(state: .leaderboards)
+        leaderboardViewController.gameCenterDelegate = gameCenterDelegate
+        // Hardcode the leaderboardIdentifier since we only have one leaderboard
+        leaderboardViewController.leaderboardIdentifier = "highestScore"
+        // Present the leaderboardViewController
+        rootViewController.present(leaderboardViewController, animated: true, completion: nil)
     }
 }
 
 
-
-
+// Previews
 struct MainScreen_Previews: PreviewProvider {
     static var previews: some View {
         MainScreen()

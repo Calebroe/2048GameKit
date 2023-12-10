@@ -25,6 +25,7 @@ struct GameView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
+    // Initialize the gridsize and the grid
     init(gridSize: GridSize) {
         self.gridSize = gridSize
         let size = gridSize.rawValue
@@ -33,6 +34,7 @@ struct GameView: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            // Extension variables (Found at bottom of file)
             gameTitle
             modeText
             scoreRow
@@ -54,6 +56,7 @@ struct GameView: View {
             .background(Color.black.opacity(0.5))
             .cornerRadius(10)
             
+            // More extension variables
             timeAndMoveCount
             newGameButton
         }
@@ -73,6 +76,7 @@ struct GameView: View {
         .overlay(gameWonOverlay)
     }
     
+    // Back button to return to MainScreen
     var backButton: some View {
         Button(action: {
             presentationMode.wrappedValue.dismiss()
@@ -103,19 +107,6 @@ struct GameView: View {
         checkForAchievements()
         startGameTimer()
         updateGlobalScore()
-    }
-
-    private func updateGlobalScore() {
-        if GKLocalPlayer.local.isAuthenticated {
-            let currentHighScore = UserDefaults.standard.integer(forKey: highScoreKey)
-            let leaderboardScore = GKLeaderboardScore()
-            leaderboardScore.player = GKLocalPlayer.local
-            leaderboardScore.leaderboardID = "highestScore"
-            if currentHighScore > leaderboardScore.value {
-                print("\(leaderboardScore.value)")
-                gameCenterHandler.reportScore(score: currentHighScore, leaderboardID: "highestScore")
-            }
-        }
     }
     
     private func addNumber() {
@@ -279,6 +270,38 @@ struct GameView: View {
         }
     }
     
+    private func isMovePossible() -> Bool {
+        for i in 0..<grid.count {
+            for j in 0..<grid[i].count {
+                let tile = grid[i][j]
+                if (i < grid.count - 1 && tile == grid[i + 1][j]) ||
+                   (j < grid[i].count - 1 && tile == grid[i][j + 1]) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    private func handleSwipe(_ value: DragGesture.Value) {
+        let horizontalAmount = value.translation.width as CGFloat
+        let verticalAmount = value.translation.height as CGFloat
+
+        if abs(horizontalAmount) > abs(verticalAmount) {
+            if horizontalAmount > 0 {
+                moveRight()
+            } else {
+                moveLeft()
+            }
+        } else {
+            if verticalAmount > 0 {
+                moveDown()
+            } else {
+                moveUp()
+            }
+        }
+    }
+    
     // Utility functions
     private func checkForGameOver() {
         if !grid.flatMap({ $0 }).contains(0) && !isMovePossible() {
@@ -362,7 +385,6 @@ struct GameView: View {
         if playTime >= 100 * 3600 { // 100 hours
             gameCenterHandler.reportAchievement(achievementID: "hour100Playtime", percentComplete: 100)
         }
-        // ... Add checks for other time-based achievements
     }
 
     private func retrieveTotalPlayTime() -> Int {
@@ -384,8 +406,33 @@ struct GameView: View {
         let newTotalPlayTime = currentTotalPlayTime + gameTime
         UserDefaults.standard.set(newTotalPlayTime, forKey: "TotalPlayTime")
     }
+    
+    // Function to update the leaderboard highscore if the player's local highscore is greater
+    private func updateGlobalScore() {
+        if GKLocalPlayer.local.isAuthenticated {
+            let currentHighScore = UserDefaults.standard.integer(forKey: highScoreKey)
+            let leaderboardScore = GKLeaderboardScore()
+            leaderboardScore.player = GKLocalPlayer.local
+            leaderboardScore.leaderboardID = "highestScore"
+            if currentHighScore > leaderboardScore.value {
+                print("\(leaderboardScore.value)")
+                gameCenterHandler.reportScore(score: currentHighScore, leaderboardID: "highestScore")
+            }
+        }
+    }
+    
+    // Function to update the local highscore
+    private func updateHighScore() {
+        let currentHighScore = UserDefaults.standard.integer(forKey: highScoreKey)
+        if score > currentHighScore {
+            UserDefaults.standard.set(score, forKey: highScoreKey)
+            highScore = score // Update the current high score state
+        } else {
+            highScore = currentHighScore // Set to the saved high score if not beaten
+        }
+    }
 
-    // Call this function when the game ends or pauses
+    // Call this function when the game ends or pauses to stop the in-game timer
     private func stopGameTimer() {
         timer?.invalidate()
         timer = nil
@@ -397,38 +444,6 @@ struct GameView: View {
         let minutes = (totalSeconds % 3600) / 60
         let seconds = totalSeconds % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    private func isMovePossible() -> Bool {
-        for i in 0..<grid.count {
-            for j in 0..<grid[i].count {
-                let tile = grid[i][j]
-                if (i < grid.count - 1 && tile == grid[i + 1][j]) ||
-                   (j < grid[i].count - 1 && tile == grid[i][j + 1]) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    
-    private func handleSwipe(_ value: DragGesture.Value) {
-        let horizontalAmount = value.translation.width as CGFloat
-        let verticalAmount = value.translation.height as CGFloat
-
-        if abs(horizontalAmount) > abs(verticalAmount) {
-            if horizontalAmount > 0 {
-                moveRight()
-            } else {
-                moveLeft()
-            }
-        } else {
-            if verticalAmount > 0 {
-                moveDown()
-            } else {
-                moveUp()
-            }
-        }
     }
 
     private func backgroundColor(for value: Int) -> Color {
@@ -453,16 +468,7 @@ struct GameView: View {
         "highScore\(gridSize.rawValue)x\(gridSize.rawValue)"
     }
 
-    private func updateHighScore() {
-        let currentHighScore = UserDefaults.standard.integer(forKey: highScoreKey)
-        if score > currentHighScore {
-            UserDefaults.standard.set(score, forKey: highScoreKey)
-            highScore = score // Update the current high score state
-        } else {
-            highScore = currentHighScore // Set to the saved high score if not beaten
-        }
-    }
-
+    // Helper function to report the player's score to GameCenter
     private func reportHighScore() {
         gameCenterHandler.reportScore(score: score, leaderboardID: "highestScore")
     }
@@ -551,8 +557,6 @@ struct GameView: View {
             }
         }
     }
-
-    // Rest of the GameView code...
     
     // Score view method
     private func scoreView(title: String, score: Int) -> some View {
@@ -581,6 +585,7 @@ struct GameView: View {
         }
     }
 }
+
 
 extension GameView {
     var gameTitle: some View {
@@ -631,6 +636,8 @@ extension GameView {
         }
 }
 
+
+// Previews
 struct GameView_Previews: PreviewProvider {
     static var previews: some View {
         GameView(gridSize: .fourByFour)

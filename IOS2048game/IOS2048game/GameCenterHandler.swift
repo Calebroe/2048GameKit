@@ -5,7 +5,6 @@
 //  Created by Caleb and Cody on 11/30/23.
 //
 
-import Foundation
 import GameKit
 import SwiftUI
 
@@ -18,6 +17,7 @@ struct GameCenterAuthenticator: UIViewControllerRepresentable {
             self.parent = parent
         }
 
+        // Presents the Game Center authentication viewController
         func player(_ player: GKPlayer, wantsToPresent viewController: UIViewController) {
             parent.presentationController.present(viewController, animated: true, completion: nil)
         }
@@ -39,8 +39,8 @@ struct GameCenterAuthenticator: UIViewControllerRepresentable {
 
 
 class GameCenterHandler: ObservableObject {
-    static let shared = GameCenterHandler()
-    var localPlayer = GKLocalPlayer.local
+    static let shared = GameCenterHandler() // Singleton to make sure only one instance is create/used
+    var localPlayer = GKLocalPlayer.local // Variable containing the local player
     
     @Published var isPresentingAuthView = false
     
@@ -62,8 +62,8 @@ class GameCenterHandler: ObservableObject {
     // Report highscores to Game Center
     func reportScore(score: Int, leaderboardID: String) {
         if localPlayer.isAuthenticated {
-            let leaderboardScore = GKLeaderboardScore()
-            leaderboardScore.leaderboardID = leaderboardID
+            let leaderboardScore = GKLeaderboardScore() // Create leaderboard object
+            leaderboardScore.leaderboardID = leaderboardID // Assign the unique identifier
             leaderboardScore.value = score
             leaderboardScore.player = self.localPlayer
 
@@ -94,9 +94,10 @@ class GameCenterHandler: ObservableObject {
     // Report achievements to Game Center
     func reportAchievement(achievementID: String, percentComplete: Double) {
         if localPlayer.isAuthenticated {
-            let achievement = GKAchievement(identifier: achievementID)
+            let achievement = GKAchievement(identifier: achievementID) // Create achievement object with unique identifier
             achievement.percentComplete = percentComplete
-            achievement.showsCompletionBanner = true // This will show the default UI banner
+            // All of our achievements will either be 0 or 100 percent complete so the showCompletionBanner will always be set to true
+            achievement.showsCompletionBanner = true // This will show the default UI banner for achievement completion
             
             GKAchievement.report([achievement]) { (error) in
                 if let error = error {
